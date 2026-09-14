@@ -57,8 +57,10 @@ jobs:
         shell: bash
         run: |
           {
+            echo "cwd: $(pwd)"
+            ls -la
             echo "node $(node -v) / npm $(npm -v)"
-            npm ci --ignore-scripts 2>&1
+            npm install --ignore-scripts --no-audit --no-fund 2>&1
           } | tee npmci.log > /dev/null
 
       - name: Empacota (instalador + portátil)
@@ -73,12 +75,16 @@ jobs:
           {
             echo "# Diagnóstico CI (run $GITHUB_RUN_ID, job desktop)"
             echo '```'
-            tail -c 6000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
+            tail -c 8000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
+            echo "== electron-builder =="
+            tail -c 8000 desktop/eb.log 2>/dev/null || echo "(sem eb.log)"
             echo '```'
           } > CI-DIAG.md
           git add CI-DIAG.md
           git -c user.name="ci-bot" -c user.email="ci@users.noreply.github.com" commit -m "diag desktop run $GITHUB_RUN_ID" || true
-          git push origin HEAD:arena/01a09da3-pr2 || true
+          for i in 1 2 3 4 5; do
+            git fetch origin arena/01a09da3-pr2 --quiet && git rebase FETCH_HEAD --quiet && git push origin HEAD:arena/01a09da3-pr2 --quiet && break || sleep 6
+          done
 
       - name: Guarda os executáveis como artefato
         uses: actions/upload-artifact@v4
@@ -134,7 +140,12 @@ jobs:
       - name: Instala deps do desktop
         working-directory: desktop
         shell: bash
-        run: npm ci --ignore-scripts > npmci.log 2>&1
+        run: |
+          {
+            echo "cwd: $(pwd)"
+            echo "node $(node -v) / npm $(npm -v)"
+            npm install --ignore-scripts --no-audit --no-fund 2>&1
+          } | tee npmci.log > /dev/null
 
       - name: Empacota a pasta portátil (zip com o .exe)
         working-directory: desktop
@@ -145,22 +156,23 @@ jobs:
           Compress-Archive -Path "out/Power Rangers Angel Grove-win32-x64" -DestinationPath "release/Power-Rangers-Angel-Grove-Windows-portable.zip" -Force
           Get-ChildItem release | Select-Object Name, Length
 
-      - name: Posta log de erro no PR (diagnóstico)
+      - name: Posta log de erro no repo (diagnóstico)
         if: failure()
         shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           {
-            echo "**Diagnóstico portátil** (run $GITHUB_RUN_ID)"
+            echo "# Diagnóstico CI (run $GITHUB_RUN_ID, job desktop-portable)"
             echo '```'
-            echo "== npm ci =="
-            tail -c 4000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
+            tail -c 6000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
             echo "== electron-packager =="
-            tail -c 4000 desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
+            tail -c 8000 desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
             echo '```'
-          } > /tmp/diag.md
-          gh issue comment 1 --repo tjfranca/PR2 --body-file /tmp/diag.md || true
+          } > CI-DIAG-PORTABLE.md
+          git add CI-DIAG-PORTABLE.md
+          git -c user.name="ci-bot" -c user.email="ci@users.noreply.github.com" commit -m "diag portable run $GITHUB_RUN_ID" || true
+          for i in 1 2 3 4 5; do
+            git fetch origin arena/01a09da3-pr2 --quiet && git rebase FETCH_HEAD --quiet && git push origin HEAD:arena/01a09da3-pr2 --quiet && break || sleep 6
+          done
 
       - name: Publica o zip no GitHub Releases
         if: github.ref == 'refs/heads/arena/01a09da3-pr2'
