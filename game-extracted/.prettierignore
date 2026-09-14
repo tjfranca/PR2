@@ -1,0 +1,6 @@
+dist/
+node_modules/
+raw_sprites/
+src/assets/
+src/game/frames.json
+package-lock.json
