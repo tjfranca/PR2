@@ -111,6 +111,15 @@ Basta dar **dois cliques** nesse arquivo para jogar — funciona offline, e voc�
 copiar só ele para um pendrive, mandar para um amigo ou hospedar em qualquer site
 (GitHub Pages, Netlify, Vercel, etc.).
 
+### Publicar no Netlify
+**Jeito mais rápido (drag & drop):** abra [app.netlify.com/drop](https://app.netlify.com/drop)
+e arraste o **`dist/index.html`** (ou o zip `Power-Rangers-Angel-Grove-netlify.zip`).
+O site fica no ar em segundos, sem build.
+
+**Deploy contínuo via Git:** no Netlify, escolha *"Import from Git"* e aponte para o
+repositório. O `netlify.toml` na raiz deste projeto já configura o comando de build
+(`npm ci && npm run build`) e a pasta de publicação (`dist`) — é só confirmar.
+
 ### Jogar no celular
 1. Rode `npm run dev -- --host` no computador.
 2. No celular (mesma rede Wi-Fi), abra o endereço `http://<IP-do-seu-PC>:5173`

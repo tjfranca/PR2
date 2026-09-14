@@ -1,0 +1,11 @@
+# Configuração de deploy no Netlify.
+# Caminho 1 (sem esforço): arraste o arquivo dist/index.html (ou o zip pronto)
+# para a área de deploy do Netlify (https://app.netlify.com/drop).
+# Caminho 2 (deploy contínuo via Git): aponte o Netlify para o repositório e
+# use as configurações abaixo — o build roda automaticamente a cada push.
+[build]
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
