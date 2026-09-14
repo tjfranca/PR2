@@ -8,5 +8,8 @@
     "email": "tjfranca@users.noreply.github.com"
   },
   "private": true,
-  "main": "main.js"
+  "main": "main.js",
+  "devDependencies": {
+    "electron": "44.3.0"
+  }
 }

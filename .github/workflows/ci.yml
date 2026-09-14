@@ -28,11 +28,12 @@ jobs:
       - run: npm run build
 
   desktop:
-    # Gera o executável para Windows (instalador NSIS + portátil).
+    # Gera o executável para Windows (instalador NSIS + portátil .exe).
     runs-on: windows-latest
     if: github.event_name != 'pull_request'
     permissions:
       contents: write
+      issues: write
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -51,9 +52,30 @@ jobs:
           mkdir -p desktop/app/dist
           cp game-extracted/dist/index.html desktop/app/dist/index.html
 
+      - name: Instala deps do desktop
+        working-directory: desktop
+        run: npm ci
+
       - name: Empacota (instalador + portátil)
         working-directory: desktop
-        run: npm ci && npx electron-builder --win --publish never
+        shell: bash
+        run: npx electron-builder --win --publish never > eb.log 2>&1
+
+      - name: Posta log de erro no PR (diagnóstico)
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const log = fs.existsSync('desktop/eb.log') ? fs.readFileSync('desktop/eb.log','utf8').slice(-8000) : '(sem eb.log)';
+            fetch('https://api.github.com/repos/tjfranca/PR2/issues/1/comments', {
+              method: 'POST',
+              headers: { Authorization: 'Bearer ' + process.env.GH_TOKEN, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ body: '**Diagnóstico electron-builder** (run ' + process.env.GITHUB_RUN_ID + ')\n\n```\n' + log + '\n```' }),
+            }).then(r => console.log('comment status:', r.status));
+          "
 
       - name: Guarda os executáveis como artefato
         uses: actions/upload-artifact@v4
@@ -63,8 +85,6 @@ jobs:
           retention-days: 14
 
       - name: Publica no GitHub Releases
-        # Roda só na branch principal do desenvolvimento; se a tag já existir
-        # (push posterior), apenas ignora sem quebrar o CI.
         if: github.ref == 'refs/heads/arena/01a09da3-pr2'
         continue-on-error: true
         uses: softprops/action-gh-release@v2
@@ -75,10 +95,80 @@ jobs:
             Jogo completo para PC (Windows 10/11, 64 bits). Escolha um:
 
             - **Setup** — instala o jogo e cria atalho na área de trabalho
-            - **Portátil** — sem instalação: baixe, dê dois cliques e jogue (pode levar num pendrive)
+            - **Portátil (.exe)** — sem instalação: baixe, dê dois cliques e jogue
 
             🎂 Na tela de título, digite **33** para a surpresa de aniversário!
 
             ⚠️ Como o arquivo não tem assinatura digital, o Windows SmartScreen pode avisar na
             primeira execução: clique em **"Mais informações" → "Executar assim mesmo"**.
           files: desktop/release/*.exe
+
+  desktop-portable:
+    # Versão "pasta com executável": zip com a pasta do jogo pronta para rodar.
+    runs-on: windows-latest
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: game-extracted/package-lock.json
+
+      - name: Build do jogo (arquivo único)
+        working-directory: game-extracted
+        run: npm ci && npm run build
+
+      - name: Prepara o app desktop
+        shell: bash
+        run: |
+          mkdir -p desktop/app/dist
+          cp game-extracted/dist/index.html desktop/app/dist/index.html
+
+      - name: Instala deps do desktop
+        working-directory: desktop
+        run: npm ci
+
+      - name: Empacota a pasta portátil (zip com o .exe)
+        working-directory: desktop
+        shell: pwsh
+        run: |
+          npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --out=out --overwrite --app-version=1.1.0 --icon=build/icon.ico --win32metadata.ProductName="Power Rangers Angel Grove" --win32metadata.FileDescription="Power Rangers - Batalha de Angel Grove" --win32metadata.CompanyName="TJ" *> portable.log
+          New-Item -ItemType Directory -Force release | Out-Null
+          Compress-Archive -Path "out/Power Rangers Angel Grove-win32-x64" -DestinationPath "release/Power-Rangers-Angel-Grove-Windows-portable.zip" -Force
+          Get-ChildItem release | Select-Object Name, Length
+
+      - name: Posta log de erro no PR (diagnóstico)
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const log = fs.existsSync('desktop/portable.log') ? fs.readFileSync('desktop/portable.log','utf8').slice(-8000) : '(sem portable.log)';
+            fetch('https://api.github.com/repos/tjfranca/PR2/issues/1/comments', {
+              method: 'POST',
+              headers: { Authorization: 'Bearer ' + process.env.GH_TOKEN, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ body: '**Diagnóstico electron-packager** (run ' + process.env.GITHUB_RUN_ID + ')\n\n```\n' + log + '\n```' }),
+            }).then(r => console.log('comment status:', r.status));
+          "
+
+      - name: Publica o zip no GitHub Releases
+        if: github.ref == 'refs/heads/arena/01a09da3-pr2'
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: desktop-portable-v1.1.0
+          name: "Power Rangers — pasta com executável (Windows, portátil)"
+          body: |
+            Baixe o zip, **extraia** e dê dois cliques em `Power Rangers Angel Grove.exe`.
+
+            🎂 Na tela de título, digite **33** para a surpresa de aniversário!
+
+            ⚠️ Como o arquivo não tem assinatura digital, o Windows SmartScreen pode avisar na
+            primeira execução: clique em **"Mais informações" → "Executar assim mesmo"**.
+          files: desktop/release/*.zip

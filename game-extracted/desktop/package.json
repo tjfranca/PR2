@@ -22,6 +22,7 @@
   "build": {
     "appId": "com.angelgrove.powerrangers",
     "productName": "Power Rangers Angel Grove",
+    "electronVersion": "44.3.0",
     "directories": {
       "output": "release",
       "app": "app"
