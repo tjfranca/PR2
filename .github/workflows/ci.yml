@@ -68,7 +68,7 @@ jobs:
       - name: Pasta portátil (zip com a pasta do jogo)
         working-directory: game-extracted/desktop
         run: |
-          cd release && zip -q -r "Power-Rangers-Angel-Grove-Windows-portable.zip" win-unpacked && cd ..
+          cd release && mv win-unpacked "Power Rangers Angel Grove" && zip -q -r "Power-Rangers-Angel-Grove-Windows-portable.zip" "Power Rangers Angel Grove" && cd ..
           ls -la release
 
       - name: Posta log de erro no repo (diagnóstico)
