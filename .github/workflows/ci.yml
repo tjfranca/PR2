@@ -55,22 +55,33 @@ jobs:
         run: |
           mkdir -p desktop/app/dist
           cp game-extracted/dist/index.html desktop/app/dist/index.html
+          echo "== estado do checkout =="
+          ls -la desktop desktop/app desktop/build
 
       - name: Instala deps do desktop
         working-directory: desktop
-        run: npm ci --ignore-scripts || npm install --ignore-scripts --no-audit --no-fund
+        run: |
+          {
+            echo "== antes do npm =="
+            ls -la
+            ls node_modules/.bin 2>/dev/null | head -20 || echo "(sem node_modules)"
+            echo "== npm install =="
+            npm install --ignore-scripts --no-audit --no-fund 2>&1
+            echo "== depois do npm =="
+            ls node_modules/.bin 2>/dev/null | head -20 || echo "(sem node_modules)"
+          } | tee npmci.log > /dev/null
 
       - name: Empacota a pasta portátil (zip com o .exe)
         working-directory: desktop
         run: |
-          npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0 --icon=build/icon.ico --win32metadata.ProductName="Power Rangers Angel Grove" --win32metadata.FileDescription="Power Rangers - Batalha de Angel Grove" --win32metadata.CompanyName="TJ" 2>&1 | tee portable.log
+          ./node_modules/.bin/electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0 --icon=build/icon.ico --win32metadata.ProductName="Power Rangers Angel Grove" --win32metadata.FileDescription="Power Rangers - Batalha de Angel Grove" --win32metadata.CompanyName="TJ" 2>&1 | tee portable.log
           mkdir -p release
           cd out && zip -q -r "../release/Power-Rangers-Angel-Grove-Windows-portable.zip" "Power Rangers Angel Grove-win32-x64" && cd ..
 
       - name: Empacota o instalador (NSIS)
         working-directory: desktop
         continue-on-error: true
-        run: npx electron-builder --win --publish never 2>&1 | tee eb.log
+        run: ./node_modules/.bin/electron-builder --win --publish never 2>&1 | tee eb.log
 
       - name: Posta log de erro no repo (diagnóstico)
         if: failure()
@@ -78,6 +89,8 @@ jobs:
           {
             echo "# Diagnóstico CI (run $GITHUB_RUN_ID)"
             echo '```'
+            echo "== npm =="
+            tail -c 6000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
             echo "== portable (electron-packager) =="
             tail -c 6000 desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
             echo "== instalador (electron-builder) =="
