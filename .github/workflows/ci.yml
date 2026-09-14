@@ -53,73 +53,35 @@ jobs:
 
       - name: Prepara o app desktop
         run: |
-          {
-            echo "== estado do checkout (runner) =="
-            pwd
-            ls -la desktop desktop/app desktop/build 2>&1 || true
-            echo "== git status =="
-            git status --porcelain | head -20
-            echo "== arquivos do desktop no index do git =="
-            git ls-files game-extracted/desktop | head -20
-          } | tee checkout.log > /dev/null
-          mkdir -p desktop/app/dist
-          cp game-extracted/dist/index.html desktop/app/dist/index.html
+          mkdir -p game-extracted/desktop/app/dist
+          cp game-extracted/dist/index.html game-extracted/desktop/app/dist/index.html
+          ls -la game-extracted/desktop/app game-extracted/desktop/app/dist
 
       - name: Instala deps do desktop
-        working-directory: desktop
-        run: |
-          {
-            echo "== antes do npm =="
-            ls -la
-            ls node_modules/.bin 2>/dev/null | head -20 || echo "(sem node_modules)"
-            echo "== npm install =="
-            npm install --ignore-scripts --no-audit --no-fund 2>&1
-            echo "== depois do npm =="
-            ls node_modules/.bin 2>/dev/null | head -20 || echo "(sem node_modules)"
-          } | tee npmci.log > /dev/null
+        working-directory: game-extracted/desktop
+        run: npm install --ignore-scripts --no-audit --no-fund
 
       - name: Empacota a pasta portátil (zip com o .exe)
-        working-directory: desktop
+        working-directory: game-extracted/desktop
         run: |
-          ./node_modules/.bin/electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0 --icon=build/icon.ico --win32metadata.ProductName="Power Rangers Angel Grove" --win32metadata.FileDescription="Power Rangers - Batalha de Angel Grove" --win32metadata.CompanyName="TJ" 2>&1 | tee portable.log
+          npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0 --icon=build/icon.ico --win32metadata.ProductName="Power Rangers Angel Grove" --win32metadata.FileDescription="Power Rangers - Batalha de Angel Grove" --win32metadata.CompanyName="TJ" \
+            || npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0
           mkdir -p release
           cd out && zip -q -r "../release/Power-Rangers-Angel-Grove-Windows-portable.zip" "Power Rangers Angel Grove-win32-x64" && cd ..
 
       - name: Empacota o instalador (NSIS)
-        working-directory: desktop
+        working-directory: game-extracted/desktop
         continue-on-error: true
-        run: ./node_modules/.bin/electron-builder --win --publish never 2>&1 | tee eb.log
-
-      - name: Posta log de erro no repo (diagnóstico)
-        if: failure()
-        run: |
-          {
-            echo "# Diagnóstico CI (run $GITHUB_RUN_ID)"
-            echo '```'
-            echo "== checkout =="
-            tail -c 5000 checkout.log 2>/dev/null || echo "(sem checkout.log)"
-            echo "== npm =="
-            tail -c 5000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
-            echo "== portable (electron-packager) =="
-            tail -c 5000 desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
-            echo "== instalador (electron-builder) =="
-            tail -c 5000 desktop/eb.log 2>/dev/null || echo "(sem eb.log)"
-            echo '```'
-            ls -la desktop/release 2>/dev/null || true
-          } > CI-DIAG.md
-          git add CI-DIAG.md
-          git -c user.name="ci-bot" -c user.email="ci@users.noreply.github.com" commit -m "diag run $GITHUB_RUN_ID" || true
-          for i in 1 2 3 4 5 6 7 8; do
-            git fetch origin arena/01a09da3-pr2 --quiet && git rebase FETCH_HEAD --quiet && git push origin HEAD:arena/01a09da3-pr2 --quiet && break || sleep 8
-          done
+        run: npx electron-builder --win --publish never
 
       - name: Guarda os executáveis como artefato
         uses: actions/upload-artifact@v4
         with:
           name: power-rangers-windows
           path: |
-            desktop/release/*.exe
-            desktop/release/*.zip
+            game-extracted/desktop/release/*.exe
+            game-extracted/desktop/release/*.zip
+          if-no-files-found: warn
           retention-days: 14
 
       - name: Publica no GitHub Releases
@@ -140,5 +102,5 @@ jobs:
             ⚠️ Como o arquivo não tem assinatura digital, o Windows SmartScreen pode avisar na
             primeira execução: clique em **"Mais informações" → "Executar assim mesmo"**.
           files: |
-            desktop/release/*.exe
-            desktop/release/*.zip
+            game-extracted/desktop/release/*.exe
+            game-extracted/desktop/release/*.zip
