@@ -65,13 +65,11 @@ jobs:
         working-directory: game-extracted/desktop
         run: npx electron-builder --win --publish never 2>&1 | tee eb.log
 
-      - name: Pasta portátil (zip com o .exe)
+      - name: Pasta portátil (zip com a pasta do jogo)
         working-directory: game-extracted/desktop
-        continue-on-error: true
         run: |
-          npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0 2>&1 | tee portable.log
-          mkdir -p release
-          cd out && zip -q -r "../release/Power-Rangers-Angel-Grove-Windows-portable.zip" "Power Rangers Angel Grove-win32-x64" && cd ..
+          cd release && zip -q -r "Power-Rangers-Angel-Grove-Windows-portable.zip" win-unpacked && cd ..
+          ls -la release
 
       - name: Posta log de erro no repo (diagnóstico)
         if: failure()
@@ -111,12 +109,13 @@ jobs:
           body: |
             Jogo completo para PC (Windows 10/11, 64 bits). Escolha um:
 
-            - **Power-Rangers-Angel-Grove-Windows-portable.zip** — extraia e dê dois cliques em `Power Rangers Angel Grove.exe` (pode levar num pendrive)
-            - **Setup** — instala o jogo e cria atalho na área de trabalho
+            - **Power.Rangers.Angel.Grove.1.1.0.exe** — portátil: sem instalação, dois cliques e joga (pode levar num pendrive)
+            - **Power-Rangers-Angel-Grove-Windows-portable.zip** — a pasta do jogo zipada: extraia e dê dois cliques no `Power Rangers Angel Grove.exe` de dentro dela
+            - **Power.Rangers.Angel.Grove.Setup.1.1.0.exe** — instala o jogo e cria atalho na área de trabalho
 
             🎂 Na tela de título, digite **33** para a surpresa de aniversário!
 
-            ⚠️ Como o arquivo não tem assinatura digital, o Windows SmartScreen pode avisar na
+            ⚠️ Como os arquivos não têm assinatura digital, o Windows SmartScreen pode avisar na
             primeira execução: clique em **"Mais informações" → "Executar assim mesmo"**.
           files: |
             game-extracted/desktop/release/*.exe
