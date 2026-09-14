@@ -4,7 +4,8 @@
   "version": "1.1.0",
   "description": "Power Rangers — Batalha de Angel Grove",
   "author": {
-    "name": "TJ"
+    "name": "TJ",
+    "email": "tjfranca@users.noreply.github.com"
   },
   "private": true,
   "main": "main.js"

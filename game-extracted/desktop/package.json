@@ -4,7 +4,8 @@
   "version": "1.1.0",
   "description": "Beat 'em up de fã dos Power Rangers — Batalha de Angel Grove (versão para PC)",
   "author": {
-    "name": "TJ"
+    "name": "TJ",
+    "email": "tjfranca@users.noreply.github.com"
   },
   "private": true,
   "main": "main.js",
@@ -12,6 +13,11 @@
     "start": "electron app",
     "pack:win": "electron-packager ./app \"Power Rangers Angel Grove\" --platform=win32 --arch=x64 --out=out --overwrite --app-version=1.1.0",
     "dist:win": "electron-builder --win --publish never"
+  },
+  "devDependencies": {
+    "electron": "^44.3.0",
+    "electron-builder": "^26.15.3",
+    "electron-packager": "^17.1.2"
   },
   "build": {
     "appId": "com.angelgrove.powerrangers",
