@@ -28,12 +28,11 @@ jobs:
       - run: npm run build
 
   desktop:
-    # Gera o executável para Windows (instalador NSIS + portátil .exe).
-    runs-on: windows-latest
+    # Executável para Windows: zip portátil (pasta com .exe) + instalador NSIS.
+    runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
     permissions:
       contents: write
-      issues: write
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -42,55 +41,61 @@ jobs:
           cache: npm
           cache-dependency-path: game-extracted/package-lock.json
 
+      - name: Instala wine (ícone/metadados do .exe)
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq wine wine64 xvfb 2>&1 | tail -2
+
       - name: Build do jogo (arquivo único)
         working-directory: game-extracted
         run: npm ci && npm run build
 
       - name: Prepara o app desktop
-        shell: bash
         run: |
           mkdir -p desktop/app/dist
           cp game-extracted/dist/index.html desktop/app/dist/index.html
 
       - name: Instala deps do desktop
         working-directory: desktop
-        shell: bash
-        run: |
-          {
-            echo "cwd: $(pwd)"
-            ls -la
-            echo "node $(node -v) / npm $(npm -v)"
-            npm install --ignore-scripts --no-audit --no-fund 2>&1
-          } | tee npmci.log > /dev/null
+        run: npm ci --ignore-scripts || npm install --ignore-scripts --no-audit --no-fund
 
-      - name: Empacota (instalador + portátil)
+      - name: Empacota a pasta portátil (zip com o .exe)
         working-directory: desktop
-        shell: bash
-        run: npx electron-builder --win --publish never > eb.log 2>&1
+        run: |
+          npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0 --icon=build/icon.ico --win32metadata.ProductName="Power Rangers Angel Grove" --win32metadata.FileDescription="Power Rangers - Batalha de Angel Grove" --win32metadata.CompanyName="TJ" 2>&1 | tee portable.log
+          mkdir -p release
+          cd out && zip -q -r "../release/Power-Rangers-Angel-Grove-Windows-portable.zip" "Power Rangers Angel Grove-win32-x64" && cd ..
+
+      - name: Empacota o instalador (NSIS)
+        working-directory: desktop
+        continue-on-error: true
+        run: npx electron-builder --win --publish never 2>&1 | tee eb.log
 
       - name: Posta log de erro no repo (diagnóstico)
         if: failure()
-        shell: bash
         run: |
           {
-            echo "# Diagnóstico CI (run $GITHUB_RUN_ID, job desktop)"
+            echo "# Diagnóstico CI (run $GITHUB_RUN_ID)"
             echo '```'
-            tail -c 8000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
-            echo "== electron-builder =="
-            tail -c 8000 desktop/eb.log 2>/dev/null || echo "(sem eb.log)"
+            echo "== portable (electron-packager) =="
+            tail -c 6000 desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
+            echo "== instalador (electron-builder) =="
+            tail -c 6000 desktop/eb.log 2>/dev/null || echo "(sem eb.log)"
             echo '```'
+            ls -la desktop/release 2>/dev/null
           } > CI-DIAG.md
           git add CI-DIAG.md
-          git -c user.name="ci-bot" -c user.email="ci@users.noreply.github.com" commit -m "diag desktop run $GITHUB_RUN_ID" || true
-          for i in 1 2 3 4 5; do
-            git fetch origin arena/01a09da3-pr2 --quiet && git rebase FETCH_HEAD --quiet && git push origin HEAD:arena/01a09da3-pr2 --quiet && break || sleep 6
-          done
+          git -c user.name="ci-bot" -c user.email="ci@users.noreply.github.com" commit -m "diag run $GITHUB_RUN_ID" || true
+          git push origin HEAD:arena/01a09da3-pr2 || true
 
       - name: Guarda os executáveis como artefato
         uses: actions/upload-artifact@v4
         with:
           name: power-rangers-windows
-          path: desktop/release/*.exe
+          path: |
+            desktop/release/*.exe
+            desktop/release/*.zip
           retention-days: 14
 
       - name: Publica no GitHub Releases
@@ -103,89 +108,13 @@ jobs:
           body: |
             Jogo completo para PC (Windows 10/11, 64 bits). Escolha um:
 
+            - **Power-Rangers-Angel-Grove-Windows-portable.zip** — extraia e dê dois cliques em `Power Rangers Angel Grove.exe` (pode levar num pendrive)
             - **Setup** — instala o jogo e cria atalho na área de trabalho
-            - **Portátil (.exe)** — sem instalação: baixe, dê dois cliques e jogue
 
             🎂 Na tela de título, digite **33** para a surpresa de aniversário!
 
             ⚠️ Como o arquivo não tem assinatura digital, o Windows SmartScreen pode avisar na
             primeira execução: clique em **"Mais informações" → "Executar assim mesmo"**.
-          files: desktop/release/*.exe
-
-  desktop-portable:
-    # Versão "pasta com executável": zip com a pasta do jogo pronta para rodar.
-    runs-on: windows-latest
-    if: github.event_name != 'pull_request'
-    permissions:
-      contents: write
-      issues: write
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: game-extracted/package-lock.json
-
-      - name: Build do jogo (arquivo único)
-        working-directory: game-extracted
-        run: npm ci && npm run build
-
-      - name: Prepara o app desktop
-        shell: bash
-        run: |
-          mkdir -p desktop/app/dist
-          cp game-extracted/dist/index.html desktop/app/dist/index.html
-
-      - name: Instala deps do desktop
-        working-directory: desktop
-        shell: bash
-        run: |
-          {
-            echo "cwd: $(pwd)"
-            echo "node $(node -v) / npm $(npm -v)"
-            npm install --ignore-scripts --no-audit --no-fund 2>&1
-          } | tee npmci.log > /dev/null
-
-      - name: Empacota a pasta portátil (zip com o .exe)
-        working-directory: desktop
-        shell: pwsh
-        run: |
-          npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0 --icon=build/icon.ico --win32metadata.ProductName="Power Rangers Angel Grove" --win32metadata.FileDescription="Power Rangers - Batalha de Angel Grove" --win32metadata.CompanyName="TJ" *> portable.log
-          New-Item -ItemType Directory -Force release | Out-Null
-          Compress-Archive -Path "out/Power Rangers Angel Grove-win32-x64" -DestinationPath "release/Power-Rangers-Angel-Grove-Windows-portable.zip" -Force
-          Get-ChildItem release | Select-Object Name, Length
-
-      - name: Posta log de erro no repo (diagnóstico)
-        if: failure()
-        shell: bash
-        run: |
-          {
-            echo "# Diagnóstico CI (run $GITHUB_RUN_ID, job desktop-portable)"
-            echo '```'
-            tail -c 6000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
-            echo "== electron-packager =="
-            tail -c 8000 desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
-            echo '```'
-          } > CI-DIAG-PORTABLE.md
-          git add CI-DIAG-PORTABLE.md
-          git -c user.name="ci-bot" -c user.email="ci@users.noreply.github.com" commit -m "diag portable run $GITHUB_RUN_ID" || true
-          for i in 1 2 3 4 5; do
-            git fetch origin arena/01a09da3-pr2 --quiet && git rebase FETCH_HEAD --quiet && git push origin HEAD:arena/01a09da3-pr2 --quiet && break || sleep 6
-          done
-
-      - name: Publica o zip no GitHub Releases
-        if: github.ref == 'refs/heads/arena/01a09da3-pr2'
-        continue-on-error: true
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: desktop-portable-v1.1.0
-          name: "Power Rangers — pasta com executável (Windows, portátil)"
-          body: |
-            Baixe o zip, **extraia** e dê dois cliques em `Power Rangers Angel Grove.exe`.
-
-            🎂 Na tela de título, digite **33** para a surpresa de aniversário!
-
-            ⚠️ Como o arquivo não tem assinatura digital, o Windows SmartScreen pode avisar na
-            primeira execução: clique em **"Mais informações" → "Executar assim mesmo"**.
-          files: desktop/release/*.zip
+          files: |
+            desktop/release/*.exe
+            desktop/release/*.zip
