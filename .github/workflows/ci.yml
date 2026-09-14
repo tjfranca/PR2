@@ -53,10 +53,17 @@ jobs:
 
       - name: Prepara o app desktop
         run: |
+          {
+            echo "== estado do checkout (runner) =="
+            pwd
+            ls -la desktop desktop/app desktop/build 2>&1 || true
+            echo "== git status =="
+            git status --porcelain | head -20
+            echo "== arquivos do desktop no index do git =="
+            git ls-files game-extracted/desktop | head -20
+          } | tee checkout.log > /dev/null
           mkdir -p desktop/app/dist
           cp game-extracted/dist/index.html desktop/app/dist/index.html
-          echo "== estado do checkout =="
-          ls -la desktop desktop/app desktop/build
 
       - name: Instala deps do desktop
         working-directory: desktop
@@ -89,18 +96,22 @@ jobs:
           {
             echo "# Diagnóstico CI (run $GITHUB_RUN_ID)"
             echo '```'
+            echo "== checkout =="
+            tail -c 5000 checkout.log 2>/dev/null || echo "(sem checkout.log)"
             echo "== npm =="
-            tail -c 6000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
+            tail -c 5000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
             echo "== portable (electron-packager) =="
-            tail -c 6000 desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
+            tail -c 5000 desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
             echo "== instalador (electron-builder) =="
-            tail -c 6000 desktop/eb.log 2>/dev/null || echo "(sem eb.log)"
+            tail -c 5000 desktop/eb.log 2>/dev/null || echo "(sem eb.log)"
             echo '```'
-            ls -la desktop/release 2>/dev/null
+            ls -la desktop/release 2>/dev/null || true
           } > CI-DIAG.md
           git add CI-DIAG.md
           git -c user.name="ci-bot" -c user.email="ci@users.noreply.github.com" commit -m "diag run $GITHUB_RUN_ID" || true
-          git push origin HEAD:arena/01a09da3-pr2 || true
+          for i in 1 2 3 4 5 6 7 8; do
+            git fetch origin arena/01a09da3-pr2 --quiet && git rebase FETCH_HEAD --quiet && git push origin HEAD:arena/01a09da3-pr2 --quiet && break || sleep 8
+          done
 
       - name: Guarda os executáveis como artefato
         uses: actions/upload-artifact@v4
