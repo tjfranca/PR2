@@ -22,6 +22,11 @@ npm -v
 
 Se aparecerem números de versão, está tudo certo.
 
+> **💻 Quer só jogar no PC, sem instalar nada?** Baixe o executável pronto na página
+> de [Releases do GitHub](https://github.com/tjfranca/PR2/releases): tem o **Setup**
+> (instala e cria atalho) e o **Portátil** (dois cliques e joga, pode levar num pendrive).
+> Se o Windows SmartScreen avisar, clique em "Mais informações → Executar assim mesmo".
+
 ---
 
 ## 2. Baixar o projeto
@@ -121,6 +126,19 @@ repositório. O `netlify.toml` na **raiz do repositório** (base `game-extracted
 configura build e pasta de publicação — é só confirmar sem mexer em nada. (Este
 projeto também tem um `netlify.toml` próprio, caso seja publicado como repositório
 independente.)
+
+### Gerar o executável para PC (Windows)
+
+A pasta `desktop/` contém o wrapper Electron que empacota o `dist/index.html` num
+executável nativo. O build oficial roda no CI e publica na página de Releases, mas
+também dá para gerar localmente (no Windows):
+
+```bash
+cd desktop
+npm ci
+mkdir -p app/dist && cp ../dist/index.html app/dist/index.html
+npm run dist:win        # gera instalador + portátil em desktop/release/
+```
 
 ### Jogar no celular
 1. Rode `npm run dev -- --host` no computador.

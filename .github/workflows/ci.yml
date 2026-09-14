@@ -3,6 +3,10 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   check:
@@ -22,3 +26,59 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build
+
+  desktop:
+    # Gera o executável para Windows (instalador NSIS + portátil).
+    runs-on: windows-latest
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: game-extracted/package-lock.json
+
+      - name: Build do jogo (arquivo único)
+        working-directory: game-extracted
+        run: npm ci && npm run build
+
+      - name: Prepara o app desktop
+        shell: bash
+        run: |
+          mkdir -p desktop/app/dist
+          cp game-extracted/dist/index.html desktop/app/dist/index.html
+
+      - name: Empacota (instalador + portátil)
+        working-directory: desktop
+        run: npm ci && npx electron-builder --win --publish never
+
+      - name: Guarda os executáveis como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: power-rangers-windows
+          path: desktop/release/*.exe
+          retention-days: 14
+
+      - name: Publica no GitHub Releases
+        # Roda só na branch principal do desenvolvimento; se a tag já existir
+        # (push posterior), apenas ignora sem quebrar o CI.
+        if: github.ref == 'refs/heads/arena/01a09da3-pr2'
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: desktop-v1.1.0
+          name: "Power Rangers: Batalha de Angel Grove — executável para Windows"
+          body: |
+            Jogo completo para PC (Windows 10/11, 64 bits). Escolha um:
+
+            - **Setup** — instala o jogo e cria atalho na área de trabalho
+            - **Portátil** — sem instalação: baixe, dê dois cliques e jogue (pode levar num pendrive)
+
+            🎂 Na tela de título, digite **33** para a surpresa de aniversário!
+
+            ⚠️ Como o arquivo não tem assinatura digital, o Windows SmartScreen pode avisar na
+            primeira execução: clique em **"Mais informações" → "Executar assim mesmo"**.
+          files: desktop/release/*.exe
