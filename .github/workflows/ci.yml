@@ -54,7 +54,8 @@ jobs:
 
       - name: Instala deps do desktop
         working-directory: desktop
-        run: npm ci
+        shell: bash
+        run: npm ci --ignore-scripts > npmci.log 2>&1
 
       - name: Empacota (instalador + portátil)
         working-directory: desktop
@@ -67,15 +68,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node -e "
-            const fs = require('fs');
-            const log = fs.existsSync('desktop/eb.log') ? fs.readFileSync('desktop/eb.log','utf8').slice(-8000) : '(sem eb.log)';
-            fetch('https://api.github.com/repos/tjfranca/PR2/issues/1/comments', {
-              method: 'POST',
-              headers: { Authorization: 'Bearer ' + process.env.GH_TOKEN, 'Content-Type': 'application/json' },
-              body: JSON.stringify({ body: '**Diagnóstico electron-builder** (run ' + process.env.GITHUB_RUN_ID + ')\n\n```\n' + log + '\n```' }),
-            }).then(r => console.log('comment status:', r.status));
-          "
+          {
+            echo "**Diagnóstico desktop** (run $GITHUB_RUN_ID)"
+            echo '```'
+            echo "== npm ci =="
+            tail -c 4000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
+            echo "== electron-builder =="
+            tail -c 4000 desktop/eb.log 2>/dev/null || echo "(sem eb.log)"
+            echo '```'
+          } > /tmp/diag.md
+          gh issue comment 1 --repo tjfranca/PR2 --body-file /tmp/diag.md || true
 
       - name: Guarda os executáveis como artefato
         uses: actions/upload-artifact@v4
@@ -130,13 +132,14 @@ jobs:
 
       - name: Instala deps do desktop
         working-directory: desktop
-        run: npm ci
+        shell: bash
+        run: npm ci --ignore-scripts > npmci.log 2>&1
 
       - name: Empacota a pasta portátil (zip com o .exe)
         working-directory: desktop
         shell: pwsh
         run: |
-          npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --out=out --overwrite --app-version=1.1.0 --icon=build/icon.ico --win32metadata.ProductName="Power Rangers Angel Grove" --win32metadata.FileDescription="Power Rangers - Batalha de Angel Grove" --win32metadata.CompanyName="TJ" *> portable.log
+          npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0 --icon=build/icon.ico --win32metadata.ProductName="Power Rangers Angel Grove" --win32metadata.FileDescription="Power Rangers - Batalha de Angel Grove" --win32metadata.CompanyName="TJ" *> portable.log
           New-Item -ItemType Directory -Force release | Out-Null
           Compress-Archive -Path "out/Power Rangers Angel Grove-win32-x64" -DestinationPath "release/Power-Rangers-Angel-Grove-Windows-portable.zip" -Force
           Get-ChildItem release | Select-Object Name, Length
@@ -147,15 +150,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node -e "
-            const fs = require('fs');
-            const log = fs.existsSync('desktop/portable.log') ? fs.readFileSync('desktop/portable.log','utf8').slice(-8000) : '(sem portable.log)';
-            fetch('https://api.github.com/repos/tjfranca/PR2/issues/1/comments', {
-              method: 'POST',
-              headers: { Authorization: 'Bearer ' + process.env.GH_TOKEN, 'Content-Type': 'application/json' },
-              body: JSON.stringify({ body: '**Diagnóstico electron-packager** (run ' + process.env.GITHUB_RUN_ID + ')\n\n```\n' + log + '\n```' }),
-            }).then(r => console.log('comment status:', r.status));
-          "
+          {
+            echo "**Diagnóstico portátil** (run $GITHUB_RUN_ID)"
+            echo '```'
+            echo "== npm ci =="
+            tail -c 4000 desktop/npmci.log 2>/dev/null || echo "(sem npmci.log)"
+            echo "== electron-packager =="
+            tail -c 4000 desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
+            echo '```'
+          } > /tmp/diag.md
+          gh issue comment 1 --repo tjfranca/PR2 --body-file /tmp/diag.md || true
 
       - name: Publica o zip no GitHub Releases
         if: github.ref == 'refs/heads/arena/01a09da3-pr2'
