@@ -61,18 +61,35 @@ jobs:
         working-directory: game-extracted/desktop
         run: npm install --ignore-scripts --no-audit --no-fund
 
-      - name: Empacota a pasta portátil (zip com o .exe)
+      - name: Empacota (instalador NSIS + portátil)
         working-directory: game-extracted/desktop
+        run: npx electron-builder --win --publish never 2>&1 | tee eb.log
+
+      - name: Pasta portátil (zip com o .exe)
+        working-directory: game-extracted/desktop
+        continue-on-error: true
         run: |
-          npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0 --icon=build/icon.ico --win32metadata.ProductName="Power Rangers Angel Grove" --win32metadata.FileDescription="Power Rangers - Batalha de Angel Grove" --win32metadata.CompanyName="TJ" \
-            || npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0
+          npx electron-packager ./app "Power Rangers Angel Grove" --platform=win32 --arch=x64 --electron-version=44.3.0 --out=out --overwrite --app-version=1.1.0 2>&1 | tee portable.log
           mkdir -p release
           cd out && zip -q -r "../release/Power-Rangers-Angel-Grove-Windows-portable.zip" "Power Rangers Angel Grove-win32-x64" && cd ..
 
-      - name: Empacota o instalador (NSIS)
-        working-directory: game-extracted/desktop
-        continue-on-error: true
-        run: npx electron-builder --win --publish never
+      - name: Posta log de erro no repo (diagnóstico)
+        if: failure()
+        run: |
+          {
+            echo "# Diagnóstico CI (run $GITHUB_RUN_ID)"
+            echo '```'
+            echo "== electron-builder =="
+            tail -c 5000 game-extracted/desktop/eb.log 2>/dev/null || echo "(sem eb.log)"
+            echo "== electron-packager =="
+            tail -c 5000 game-extracted/desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
+            echo '```'
+          } > CI-DIAG.md
+          git add CI-DIAG.md
+          git -c user.name="ci-bot" -c user.email="ci@users.noreply.github.com" commit -m "diag run $GITHUB_RUN_ID" || true
+          for i in 1 2 3 4 5; do
+            git fetch origin arena/01a09da3-pr2 --quiet && git rebase FETCH_HEAD --quiet && git push origin HEAD:arena/01a09da3-pr2 --quiet && break || sleep 8
+          done
 
       - name: Guarda os executáveis como artefato
         uses: actions/upload-artifact@v4
