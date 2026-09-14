@@ -1,0 +1,35 @@
+{
+  "name": "power-rangers-angel-grove-desktop",
+  "productName": "Power Rangers Angel Grove",
+  "version": "1.1.0",
+  "description": "Beat 'em up de fã dos Power Rangers — Batalha de Angel Grove (versão para PC)",
+  "author": {
+    "name": "TJ"
+  },
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron app",
+    "pack:win": "electron-packager ./app \"Power Rangers Angel Grove\" --platform=win32 --arch=x64 --out=out --overwrite --app-version=1.1.0",
+    "dist:win": "electron-builder --win --publish never"
+  },
+  "build": {
+    "appId": "com.angelgrove.powerrangers",
+    "productName": "Power Rangers Angel Grove",
+    "directories": {
+      "output": "release",
+      "app": "app"
+    },
+    "files": ["main.js", "dist/**/*", "package.json"],
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Power Rangers Angel Grove"
+    }
+  }
+}
