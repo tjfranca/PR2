@@ -117,8 +117,10 @@ e arraste o **`dist/index.html`** (ou o zip `Power-Rangers-Angel-Grove-netlify.z
 O site fica no ar em segundos, sem build.
 
 **Deploy contínuo via Git:** no Netlify, escolha *"Import from Git"* e aponte para o
-repositório. O `netlify.toml` na raiz deste projeto já configura o comando de build
-(`npm ci && npm run build`) e a pasta de publicação (`dist`) — é só confirmar.
+repositório. O `netlify.toml` na **raiz do repositório** (base `game-extracted`) já
+configura build e pasta de publicação — é só confirmar sem mexer em nada. (Este
+projeto também tem um `netlify.toml` próprio, caso seja publicado como repositório
+independente.)
 
 ### Jogar no celular
 1. Rode `npm run dev -- --host` no computador.

@@ -1,0 +1,9 @@
+# Deploy no Netlify via "Import from Git" — configuração na raiz do repositório.
+# O jogo vive na subpasta game-extracted/; o Netlify roda o build a partir dela.
+[build]
+  base = "game-extracted"
+  command = "npm ci && npm run build"
+  publish = "game-extracted/dist"
+
+[build.environment]
+  NODE_VERSION = "22"
