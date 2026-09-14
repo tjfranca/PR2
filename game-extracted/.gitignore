@@ -1,0 +1,5 @@
+node_modules/
+dist/
+raw_sprites/
+*.log
+.DS_Store

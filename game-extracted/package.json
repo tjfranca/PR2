@@ -1,0 +1,41 @@
+{
+  "name": "power-rangers-angel-grove",
+  "private": true,
+  "version": "1.1.0",
+  "description": "Beat 'em up de fã — Power Rangers: Batalha de Angel Grove (React + Canvas, sprites de MMPR: The Movie)",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" index.html package.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "clsx": "2.1.1",
+    "omggif": "^1.0.10",
+    "pngjs": "^7.0.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "tailwind-merge": "3.4.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@tailwindcss/vite": "4.1.17",
+    "@types/node": "22.19.17",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.1",
+    "eslint": "^9.39.0",
+    "prettier": "^3.6.2",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "7.3.2",
+    "vite-plugin-singlefile": "2.3.0",
+    "vitest": "^5.0.0"
+  }
+}

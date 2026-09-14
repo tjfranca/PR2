@@ -1,0 +1,15 @@
+{
+  "name": "power-rangers-angel-grove",
+  "productName": "Power Rangers Angel Grove",
+  "version": "1.1.0",
+  "description": "Power Rangers — Batalha de Angel Grove",
+  "author": {
+    "name": "TJ",
+    "email": "tjfranca@users.noreply.github.com"
+  },
+  "private": true,
+  "main": "main.js",
+  "devDependencies": {
+    "electron": "44.3.0"
+  }
+}

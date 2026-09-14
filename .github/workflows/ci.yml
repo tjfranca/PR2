@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: game-extracted
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: game-extracted/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+
+  desktop:
+    # Executável para Windows: zip portátil (pasta com .exe) + instalador NSIS.
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: game-extracted/package-lock.json
+
+      - name: Instala wine (ícone/metadados do .exe)
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq wine wine64 xvfb 2>&1 | tail -2
+
+      - name: Build do jogo (arquivo único)
+        working-directory: game-extracted
+        run: npm ci && npm run build
+
+      - name: Prepara o app desktop
+        run: |
+          mkdir -p game-extracted/desktop/app/dist
+          cp game-extracted/dist/index.html game-extracted/desktop/app/dist/index.html
+          ls -la game-extracted/desktop/app game-extracted/desktop/app/dist
+
+      - name: Instala deps do desktop
+        working-directory: game-extracted/desktop
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Empacota (instalador NSIS + portátil)
+        working-directory: game-extracted/desktop
+        run: npx electron-builder --win --publish never 2>&1 | tee eb.log
+
+      - name: Pasta portátil (zip com a pasta do jogo)
+        working-directory: game-extracted/desktop
+        run: |
+          cd release && mv win-unpacked "Power Rangers Angel Grove" && zip -q -r "Power-Rangers-Angel-Grove-Windows-portable.zip" "Power Rangers Angel Grove" && cd ..
+          ls -la release
+
+      - name: Posta log de erro no repo (diagnóstico)
+        if: failure()
+        run: |
+          {
+            echo "# Diagnóstico CI (run $GITHUB_RUN_ID)"
+            echo '```'
+            echo "== electron-builder =="
+            tail -c 5000 game-extracted/desktop/eb.log 2>/dev/null || echo "(sem eb.log)"
+            echo "== electron-packager =="
+            tail -c 5000 game-extracted/desktop/portable.log 2>/dev/null || echo "(sem portable.log)"
+            echo '```'
+          } > CI-DIAG.md
+          git add CI-DIAG.md
+          git -c user.name="ci-bot" -c user.email="ci@users.noreply.github.com" commit -m "diag run $GITHUB_RUN_ID" || true
+          for i in 1 2 3 4 5; do
+            git fetch origin arena/01a09da3-pr2 --quiet && git rebase FETCH_HEAD --quiet && git push origin HEAD:arena/01a09da3-pr2 --quiet && break || sleep 8
+          done
+
+      - name: Guarda os executáveis como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: power-rangers-windows
+          path: |
+            game-extracted/desktop/release/*.exe
+            game-extracted/desktop/release/*.zip
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Publica no GitHub Releases
+        if: github.ref == 'refs/heads/arena/01a09da3-pr2'
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: desktop-v1.1.0
+          name: "Power Rangers: Batalha de Angel Grove — executável para Windows"
+          body: |
+            Jogo completo para PC (Windows 10/11, 64 bits). Escolha um:
+
+            - **Power.Rangers.Angel.Grove.1.1.0.exe** — portátil: sem instalação, dois cliques e joga (pode levar num pendrive)
+            - **Power-Rangers-Angel-Grove-Windows-portable.zip** — a pasta do jogo zipada: extraia e dê dois cliques no `Power Rangers Angel Grove.exe` de dentro dela
+            - **Power.Rangers.Angel.Grove.Setup.1.1.0.exe** — instala o jogo e cria atalho na área de trabalho
+
+            🎂 Na tela de título, digite **33** para a surpresa de aniversário!
+
+            ⚠️ Como os arquivos não têm assinatura digital, o Windows SmartScreen pode avisar na
+            primeira execução: clique em **"Mais informações" → "Executar assim mesmo"**.
+          files: |
+            game-extracted/desktop/release/*.exe
+            game-extracted/desktop/release/*.zip
