@@ -1,5 +1,8 @@
 name: fetch-photos
-on: workflow_dispatch
+on:
+  push:
+    branches: [arena/01a0da27-pr2]
+    paths: ['entrega/_fetch_photos.trigger']
 jobs:
   fetch:
     runs-on: ubuntu-latest
