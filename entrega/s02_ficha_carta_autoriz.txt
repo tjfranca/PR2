@@ -22,6 +22,7 @@
 | 13/07/26 | 1h de avaliação (10ª sessão) | Responsáveis/pais |
 | __/__/__ | 6h estudo de caso/avaliação | Estagiária |
 | __/__/__ | 30h pesquisa (avaliação) | Estagiária |
+<<IMG:image34.png;15>>
 | __/__/__ | 8h elaboração do relatório de avaliação | Estagiária |
 | __/__/__ | 8h II encontro | |
 | 07/06/26 | 2h devolutiva da avaliação com os pais/escola | Responsáveis/pais |
@@ -53,6 +54,7 @@ Prezada senhora Marília Ferraz Martins,
 Informamos que a aluna Rebeca Arruda Araújo, regularmente matriculada no curso de especialização Lato Sensu em Neuropsicopedagogia Clínica do Rhema Neuroeducação, necessita aplicar os conhecimentos teóricos de forma prática, por meio do estágio clínico, e desta forma atender as orientações para atuação clínica. Venho por meio desta solicitar que acolha no campo de estágio a aluna referida acima, que encontra-se sob minha orientação, supervisão e do Rhema Neuroeducação.
 Coloco-me à disposição para quaisquer esclarecimentos.
 Atenciosamente,
+<<IMG:image27.png;10.8>>
 ^ Profª Stephany Moure Porto
 ^ Supervisora de Estágio Clínico em Neuropsicopedagogia
 ^ Rhema Neuroeducação
@@ -70,7 +72,8 @@ Fico ciente, também, da importância de iniciar e concluir o acompanhamento neu
 _______________________________, ______ de ______________________ de ____________.
 Responsável (Assinatura)
 **Importantíssimo: não iniciar o estágio com a criança sem ter esta autorização preenchida e assinada. ANEXAR À PASTA a folha assinada pela família (a cópia já preenchida pela responsável encontra-se no original).**
-**ATUALIZAÇÃO (versão mais recente do documento original):** a autorização já está preenchida e **assinada** — há uma imagem/digitalização da folha assinada no arquivo original. No .docx organizado, inserir essa imagem/scan aqui no lugar desta linha **[ANEXO: scan da autorização ASSINADA — copiar do original]**.
+**ATUALIZAÇÃO (versão mais recente do documento original):** a autorização já está preenchida e **assinada** — há uma imagem/digitalização da folha assinada no arquivo original. No .docx organizado, inserir essa imagem/scan aqui no lugar desta linha .
+<<IMG:image32.png;13>>
 <<<PAGEBREAK>>>
 # 06. FICHA NEUROPSICOPEDAGÓGICA
 **Data do primeiro contato:** 03/04/2026

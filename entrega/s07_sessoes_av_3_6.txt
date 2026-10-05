@@ -12,7 +12,8 @@
 - Teste de rima: **número de acertos: 19 (na média)**
 - Segmentação silábica (palmas): treino lata=2, sabão=2, mochila=3, árvore=3, elástico=4. Teste: SAPO, CAMISA, CHUVA, PRE... FRASE, MÁQUINA, PORTÃO (bateu 3 palmas), SEGREDO, MAMÃO (bateu 3 palmas; parou para contar que pegou em uma cobra no dia anterior), PERSONAGEM, CASTELO, FÓSFORO (bateu 4 palmas e falou que tinham 5 sílabas; parou para cantar) — **número de acertos: 09 (na média)**
 **Registro da estagiária:** durante o teste de rima Laura estava muito inquieta, mexendo muito, esqueceu várias palavras e ficou o tempo inteiro com lápis na boca.
-**[ANEXO: folhas do protocolo aplicadas e corrigidas — inserir do original]**
+<<IMG:image24.png;15>>
+<<IMG:image66.png;6>>
 <<<PAGEBREAK>>>
 ## 4ª SESSÃO — 17/04/26
 ### Protocolo de Avaliação das Habilidades Cognitivo-Linguísticas — Processamento auditivo
@@ -25,7 +26,9 @@
 - **Memória imediata (ordem direta/inversa de dígitos):** treino 4-7→7-4; 8-2→2-8. Teste: 5-2; 9-4; 2-8-5; 2-8-5; 7-9-1; 1-7-5-9; 4-9-8-2; 1-5-4-2-8; 2-1-4-7-5; 7-2-5-4-9-1; 1-2-3-4-5-10-1000. **Número de acertos: 03 (abaixo da média)**
 **Registro da estagiária:** o atendimento desta sessão foi realizado em um local diferente, na escola de inglês (as sessões anteriores foram realizadas na casa da paciente). Laura estava mais agitada e com o lápis na boca durante toda a sessão (ela morde o lápis bastante), dispersou-se muito fácil, perguntando sobre objetos na sala, contando histórias e falas aleatórias durante a execução das atividades. Na primeira atividade, repetição das palavras, teve dificuldade de lembrar as primeiras palavras: acertou 9 palavras, inventou palavras e falou palavras que não foram ditas. Na repetição de pseudopalavras acertou todas. No exercício de ritmo mostrou grande empolgação (toca bateria); nas sequências maiores não esperava para escutar e já começava a batucar, mas quando solicitada a prestar atenção e só depois repetir, acertou. Na discriminação de sons não apresentou dificuldade. Na memória imediata apresentou maior dificuldade, acertando 3 sequências e falando números que não existiam nos blocos.
 Laura é uma menina muito criativa e se interessa por coisas diferentes; por esse motivo acreditamos que tenha prestado mais atenção nessa etapa da sessão.
-**[ANEXO: folhas do protocolo aplicadas e corrigidas — inserir do original]**
+<<IMG:image72.png;7.4>>
+<<IMG:image28.png;4>>
+<<IMG:image25.png;5>>
 <<<PAGEBREAK>>>
 ## 5ª SESSÃO — 01/05/26
 ### Protocolo de Avaliação das Habilidades Cognitivo-Linguísticas — Processamento visual, velocidade de processamento e cálculo
@@ -35,9 +38,12 @@ Laura é uma menina muito criativa e se interessa por coisas diferentes; por ess
 - **2) Memória visual** (figura observada por 1 minuto e coberta): quantas pessoas aparecem na figura? **06**; quantas flores? **09**; quantas borboletas? **04**; o que a menina está segurando? **Nada**; o que o vovô está segurando? **Uma bengala**; quantas pessoas usam óculos? **01**; quantas pessoas usam boné? **01**; qual objeto tem ao lado do menino? **Bola**. — na média
 - **3) Nomeação rápida de figuras:** número de acertos: **33 (na média)**. Laura se autocorrigiu as duas vezes que errou.
 - **4) Nomeação rápida de dígitos:** tempo total — 1ª vez: **1'17''**; 2ª vez: **1'07''**
-- **5) Cálculo matemático:** **[ANEXO: folha do cálculo aplicada e corrigida — inserir do original]**
+- **5) Cálculo matemático:** 
+<<IMG:image36.jpg;15>>
 **Registro da estagiária:** nesta sessão Laura não apresentou dificuldades. A aluna estava fazendo a maquete de uma cidade com isopor e tinta; foi combinado com ela que teria alguns minutos trabalhando na maquete para então iniciar a sessão. Na cópia das formas desenhou rápido e corretamente. Na observação da imagem perguntou umas 4 vezes se o tempo (1 minuto) já tinha acabado. Na nomeação de figuras fez rapidamente e em duas figuras trocou o nome, porém se corrigiu no mesmo instante. Na sequência de números não teve dificuldades, falou sem erros; na primeira vez, após a segunda linha, começou a falar os números em dezenas — na segunda vez foi pedido que falasse todos os números sem juntá-los em dezenas e falou tudo corretamente. Assim que terminou a sessão, voltou a fazer a maquete.
-**[ANEXO: folhas do protocolo aplicadas e corrigidas — inserir do original]**
+<<IMG:image82.jpg;13>>
+<<IMG:image52.png;12.1>>
+<<IMG:image55.jpg;6>>
 <<<PAGEBREAK>>>
 ## 6ª SESSÃO — 12/06/2026
 ### PROADE — Proposta de Avaliação das Dificuldades de Aprendizagem (Bacha; Volpe, 2014)
@@ -52,5 +58,7 @@ Um fator bastante evidente durante a sessão foi a falta de paciência e a dific
 - 3 — Circule o número maior: a) 74 e 81; b) 90 e 95; c) 25 e 16; d) 88 e 98
 - 4 — Coloque os números em ordem crescente: 10 – 25 – 8 – 44 – 81 – 19 → 8 – 10 – 19 – 25 – 44 – 81
 - 5 — Resolva as operações: 5 + 3 = 8; 9 – 4 = 5; 14 + 25 = 39; 48 – 16 = 32; 15 + 37 = ; 54 – 15 = ; 3 × 2 = ; 8 : 2 =
-**[ANEXO: folhas do PROADE aplicadas e corrigidas — inserir do original]**
+<<IMG:image67.jpg;15>>
+<<IMG:image71.jpg;12>>
+<<IMG:image3.png;11.9>>
 <<<PAGEBREAK>>>

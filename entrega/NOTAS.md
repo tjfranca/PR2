@@ -50,3 +50,11 @@ s00 capa/contracapa/sumário | s01 introdução | s02 ficha+carta+autorização+
 - build_docx.py agora aceita nome de saída por argv: `python3 build_docx.py <nome>.docx`.
 - Saída: PASTA_DE_ESTAGIO_REBECA_V2_ORGANIZADA.docx (39 764 bytes, validado).
 - Imagens: continuam apenas nos originais (fetch não extrai binários; figuras do Google Drawings não são embutíveis) — marcadores [ANEXO: ...] no docx.
+
+## V2+fotos (2026-10-05)
+- Bloqueio de rede do sandbox: TLS cortado para TODO host exceto GitHub → fotos impossíveis por curl.
+- Solução: workflow GitHub Actions `fetch-photos` (gatilho push em `entrega/_fetch_photos.trigger`) baixou `export?format=docx` no runner e commitou `entrega/_fotos_rebeca/` (78 imagens + document.xml/rels ≈26 MB).
+- Extração do mapa: blocos wp:inline/anchor → 75 imagens reais (skip: image51 linha, image58 linha, image73 ícone 47×47).
+- `insert_images.py` = mapa âncora→imagem nos s*.txt (marcador `<<IMG:arquivo;largura_cm>>`); `build_docx.py` embute media+rels+content-types.
+- Resultado: **PASTA_DE_ESTAGIO_REBECA_V2_ORGANIZADA.docx = 25 173 261 bytes, 75 imagens embutidas**.
+- Faltam ainda, do lado da Rebeca: fotos das sessões de intervenção 2–10 (só existe foto da 1ª) e páginas de atividades corrigidas da intervenção.
