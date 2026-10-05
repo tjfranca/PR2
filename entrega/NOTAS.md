@@ -42,3 +42,11 @@ I. Notas "⚠️ NOTA PARA A REBECA" do original: resolvidas nesta versão (remo
 
 ## Estrutura do arquivo gerado (s*.txt em ordem):
 s00 capa/contracapa/sumário | s01 introdução | s02 ficha+carta+autorização+ficha neuro | s03 anamnese | s04 escola+questionário | s05 roteiro avaliação | s06-s08 sessões avaliação 1-10 | s09 relatório+devolutiva | s10 separador+roteiro intervenção | s11 sessões intervenção 1-10 | s12 parecer+devolutiva final+conclusão+referências+anexos+pendências
+
+## V2 (2026-10-05) — deltas do doc atualizado `1r1e_QPWhndTMLFGHL1UKy1UFkqSxYQgz`
+- Fonte: versão mais recente da pasta da Rebeca (13 chunks lidos integralmente via /export?format=txt).
+- Inserido: relato completo da Família Educativa (s06); bloco "DADOS DA VISITA/CONTATO NO AMBIENTE ESCOLAR" (s04, resposta ao TODO); comentários professora↔estagiária da anamnese (s03); nota de autorização assinada (s02); enriquecimento II/III do relatório com rascunho 1–12 (prematuridade, queixa de impaciência) (s09); roteiro de intervenção na versão nova da Rebeca com divergências sinalizadas (5ª,6ª,7ª,8ª,10ª) (s10); registros das sessões 4,6,7,9,10 atualizados em 1ª pessoa (s10); pendências ampliadas (s12).
+- Mantido: modelo oficial I–VII do relatório (rascunho 1–12 descartado como versão); ficha de controle ausente no doc novo — mantida do V1 (item 3 do caderno); ordem dos 17 itens.
+- build_docx.py agora aceita nome de saída por argv: `python3 build_docx.py <nome>.docx`.
+- Saída: PASTA_DE_ESTAGIO_REBECA_V2_ORGANIZADA.docx (39 764 bytes, validado).
+- Imagens: continuam apenas nos originais (fetch não extrai binários; figuras do Google Drawings não são embutíveis) — marcadores [ANEXO: ...] no docx.
