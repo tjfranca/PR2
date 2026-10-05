@@ -1,0 +1,53 @@
+name: fetch-photos
+on: workflow_dispatch
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Baixar docx do Google Docs e extrair mídia
+        run: |
+          set -x
+          mkdir -p entrega/_fotos_rebeca
+          DOC="https://docs.google.com/document/d/1r1e_QPWhndTMLFGHL1UKy1UFkqSxYQgz/export?format=docx"
+          curl -sL --max-time 90 -o /tmp/rebeca.docx "$DOC"
+          file /tmp/rebeca.docx
+          cd /tmp
+          unzip -o -q rebeca.docx -d rebeca_x || { echo FALHA_UNZIP; exit 1; }
+          mkdir -p /home/user/out 2>/dev/null || true
+          OUT="$GITHUB_WORKSPACE/entrega/_fotos_rebeca"
+          if [ -d rebeca_x/word/media ]; then
+            cp -v rebeca_x/word/media/* "$OUT/" || true
+          fi
+          cp -v rebeca_x/word/document.xml "$OUT/document.xml" || true
+          # imagens referenciadas externamente (drawings, googleusercontent)
+          if [ -f rebeca_x/word/_rels/document.xml.rels ]; then
+            cp -v rebeca_x/word/_rels/document.xml.rels "$OUT/document.xml.rels" || true
+            grep -o 'Target="[^"]*"' rebeca_x/word/_rels/document.xml.rels | grep -i 'TargetMode="External"' -i || true
+            python3 - <<'PY'
+          import re, os, urllib.request
+          rels = open('/tmp/rebeca_x/word/_rels/document.xml.rels').read()
+          out = os.environ['GITHUB_WORKSPACE'] + '/entrega/_fotos_rebeca'
+          urls = re.findall(r'Target="(https?://[^"]+)"', rels)
+          for i, u in enumerate(urls):
+              u = u.replace('&amp;', '&')
+              try:
+                  ext = '.png'
+                  fn = os.path.join(out, f'extern_{i:02d}{ext}')
+                  urllib.request.urlretrieve(u, fn)
+                  print('OK', u[:80], '->', fn)
+              except Exception as e:
+                  print('FALHA', u[:80], e)
+          PY
+          fi
+          ls -la "$OUT" | head -80
+      - name: Commit e push
+        run: |
+          git config user.name "arena-agent"
+          git config user.email "arena-agent@users.noreply.github.com"
+          git add entrega/_fotos_rebeca || true
+          git diff --cached --quiet && echo "nada novo" && exit 0
+          git commit -m "photos: mídia extraída do doc da Rebeca (workflow fetch-photos)"
+          git push
