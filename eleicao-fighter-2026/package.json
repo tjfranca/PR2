@@ -1,0 +1,12 @@
+{
+  "name": "eleicao-fighter-2026",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Fã-game de luta 16-bit (paródia) com os 12 pré-candidatos à Presidência do Brasil em 2026. HTML5/Canvas puro, sem build necessário para jogar.",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node tests/smoke.mjs && node tests/smoke-2p.mjs"
+  },
+  "license": "MIT"
+}
