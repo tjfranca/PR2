@@ -259,6 +259,7 @@ export const ROSTER = [
     bio: 'Advogada formada em Direito Administrativo, preside o diretório estadual do DC.',
     home: 'Mato Grosso',
     stage: 'tse',
+    portrait: 'assets/portraits/clariana.png',
     stats: { power: 2, speed: 4, defense: 4, special: 4 },
     visual: {
       skin: '#e3b088', hair: '#3b1f0f', hairStyle: 'long', facial: 'none',
@@ -282,6 +283,7 @@ export const ROSTER = [
     bio: 'Médico veterinário, candidato pelo Democrata com foco na área rural.',
     home: 'Interior do Brasil',
     stage: 'planalto',
+    portrait: 'assets/portraits/grassi.png',
     stats: { power: 3, speed: 3, defense: 4, special: 3 },
     visual: {
       skin: '#d79a68', hair: '#8a8a8a', hairStyle: 'short', facial: 'mustache',
