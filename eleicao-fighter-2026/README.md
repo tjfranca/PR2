@@ -43,6 +43,23 @@ jogo usa módulos ES (`import`/`export`).
 2. Pronto — o jogo fica disponível em
    `https://<seu-usuario>.github.io/eleicao-fighter-2026/`.
 
+### Gerando um arquivo único para jogar offline (sem instalar nada)
+
+Se você só quer baixar **um arquivo** e dar duplo clique para jogar — sem
+clonar repositório, sem servidor, sem internet — gere a versão "standalone":
+
+```bash
+npm install --no-save esbuild
+node build-standalone.mjs
+```
+
+Isso cria `../Eleicao-Fighter-2026.html`: um único arquivo HTML com todo o
+JavaScript empacotado (via esbuild, sem `import`/`export`) e todas as
+imagens/fontes embutidas como `data:` URIs. Basta copiar esse arquivo para
+qualquer computador (Windows, Mac ou Linux) e abrir com duplo clique — ele
+roda 100% no navegador padrão, sem precisar de internet nem de servidor
+local.
+
 ## 🕹️ Controles
 
 | Ação | Jogador 1 | Jogador 2 |
