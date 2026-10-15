@@ -1781,29 +1781,15 @@ html, body {
       for (const f of order) {
         const sx = f.x;
         const sy = floorScreenY - f.y;
-        const portraitImg = this.portraits[f.def.id];
-        const { action, t } = f.getAnimState();
-        const drawn = portraitImg && drawFighterPortrait(ctx, {
+        drawFighterSprite(ctx, {
           x: sx,
           y: sy,
           facing: f.facing,
-          img: portraitImg,
-          action,
-          t: t * 6 + f.playerIndex * 10,
-          flash: f.flash,
-          heightUnits: 136 * (f.visual.build || 1)
+          scale: f.scale,
+          visual: f.visual,
+          pose: f.getPoseFrame(),
+          flash: f.flash
         });
-        if (!drawn) {
-          drawFighterSprite(ctx, {
-            x: sx,
-            y: sy,
-            facing: f.facing,
-            scale: f.scale,
-            visual: f.visual,
-            pose: f.getPoseFrame(),
-            flash: f.flash
-          });
-        }
       }
       for (const pr of this.projectiles) {
         drawProjectile(ctx, pr.x, floorScreenY - pr.y, pr.facing, pr.color, pr.t);
