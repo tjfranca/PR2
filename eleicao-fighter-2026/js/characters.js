@@ -2,14 +2,15 @@
 // ELEIÇÃO FIGHTER 2026 — dados do elenco (paródia / fã-game)
 // Baseado na lista oficial de 12 candidaturas à Presidência do
 // Brasil homologadas pelo TSE para as eleições de 2026.
-// Nenhuma imagem real dos candidatos é usada: os lutadores são
-// avatares pixel-art 100% originais e caricatos, apenas com o
-// nome, partido, número e vice reais para fins de humor/paródia.
+// Os retratos são ilustrações de caricatura 100% originais e
+// geradas digitalmente, no estilo clássico de charge de jornal
+// (cartum editorial exagerado e cômico) — não são fotos reais.
 // =============================================================
 
 export const ROSTER = [
   {
     id: 'lula',
+    portrait: 'assets/portraits/lula.png',
     name: 'Lula',
     full: 'Luiz Inácio Lula da Silva',
     party: 'PT',
@@ -33,6 +34,7 @@ export const ROSTER = [
   },
   {
     id: 'flavio',
+    portrait: 'assets/portraits/flavio.png',
     name: 'Flávio Bolsonaro',
     full: 'Flávio Nantes Bolsonaro',
     party: 'PL',
@@ -56,6 +58,7 @@ export const ROSTER = [
   },
   {
     id: 'caiado',
+    portrait: 'assets/portraits/caiado.png',
     name: 'Ronaldo Caiado',
     full: 'Ronaldo Caiado',
     party: 'PSD',
@@ -79,6 +82,7 @@ export const ROSTER = [
   },
   {
     id: 'zema',
+    portrait: 'assets/portraits/zema.png',
     name: 'Romeu Zema',
     full: 'Romeu Zema Neto',
     party: 'Novo',
@@ -102,6 +106,7 @@ export const ROSTER = [
   },
   {
     id: 'renan',
+    portrait: 'assets/portraits/renan.png',
     name: 'Renan Santos',
     full: 'Renan Santos',
     party: 'Missão',
@@ -125,6 +130,7 @@ export const ROSTER = [
   },
   {
     id: 'cury',
+    portrait: 'assets/portraits/cury.png',
     name: 'Augusto Cury',
     full: 'Augusto Jorge Cury',
     party: 'Avante',
@@ -148,6 +154,7 @@ export const ROSTER = [
   },
   {
     id: 'samara',
+    portrait: 'assets/portraits/samara.png',
     name: 'Samara Martins',
     full: 'Samara Martins',
     party: 'UP',
@@ -171,6 +178,7 @@ export const ROSTER = [
   },
   {
     id: 'pimenta',
+    portrait: 'assets/portraits/pimenta.png',
     name: 'Rui Costa Pimenta',
     full: 'Rui Costa Pimenta',
     party: 'PCO',
@@ -194,6 +202,7 @@ export const ROSTER = [
   },
   {
     id: 'edmilson',
+    portrait: 'assets/portraits/edmilson.png',
     name: 'Edmilson Costa',
     full: 'Edmilson Costa',
     party: 'PCB',
@@ -217,6 +226,7 @@ export const ROSTER = [
   },
   {
     id: 'hertz',
+    portrait: 'assets/portraits/hertz.png',
     name: 'Hertz Dias',
     full: 'Hertz Dias',
     party: 'PSTU',

@@ -49,7 +49,7 @@ global.document = {
   createElement: () => ({ getContext: () => makeCtxProxy(), style: {} })
 };
 global.Image = class {
-  constructor() { this.width = 100; this.height = 100; this.complete = true; }
+  constructor() { this.width = 100; this.height = 100; this.naturalWidth = 100; this.naturalHeight = 150; this.complete = true; }
   set src(v) { this._src = v; if (this.onload) setTimeout(this.onload, 0); }
   get src() { return this._src; }
 };

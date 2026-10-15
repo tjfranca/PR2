@@ -394,6 +394,91 @@ export function drawFighterSprite(ctx, opts) {
   ctx.restore();
 }
 
+// -------------------------------------------------------------
+// Retrato-caricatura (ilustração estática por personagem) com
+// animação por transformação de corpo inteiro — usado quando a
+// imagem do lutador já foi carregada; cai de volta pro boneco
+// vetorial acima caso a imagem não exista/carregue.
+// -------------------------------------------------------------
+export function drawFighterPortrait(ctx, opts) {
+  const {
+    x, y, facing, img, action, t, flash = 0, alpha = 1, heightUnits = 150
+  } = opts;
+
+  if (!img || !img.complete || !img.naturalWidth) return false;
+
+  const drawH = heightUnits;
+  const drawW = img.naturalWidth * (drawH / img.naturalHeight);
+
+  let rot = 0, sx = 1, sy = 1, offX = 0, offY = 0, tint = null;
+  const clamp01 = (v) => Math.max(0, Math.min(1, v));
+
+  switch (action) {
+    case 'idle':
+      offY = Math.sin(t * 3.2) * 2;
+      break;
+    case 'walk':
+      offY = Math.abs(Math.sin(t * 9)) * 3;
+      rot = Math.sin(t * 9) * 0.045;
+      break;
+    case 'jump':
+      sy = 1.06; sx = 0.96; offY = -2;
+      break;
+    case 'crouch':
+      sy = 0.8; offY = drawH * 0.1;
+      break;
+    case 'punch':
+    case 'kick':
+    case 'special1':
+    case 'special2':
+    case 'super': {
+      const p = clamp01(t);
+      let k;
+      if (p < 0.3) k = p / 0.3;
+      else if (p < 0.6) k = 1;
+      else k = 1 - (p - 0.6) / 0.4;
+      const boost = action === 'super' ? 1.6 : action === 'kick' ? 1.2 : 1;
+      rot = k * 0.14 * boost;
+      sx = 1 + k * 0.07 * boost;
+      sy = 1 - k * 0.05 * boost;
+      offX = k * 7 * boost;
+      if (action === 'special1' || action === 'special2') tint = `rgba(255,222,120,${0.22 * k})`;
+      if (action === 'super') tint = `rgba(255,255,255,${0.3 * k})`;
+      break;
+    }
+    case 'hit':
+      rot = -0.12; offX = -7;
+      tint = `rgba(255,60,60,0.4)`;
+      break;
+    case 'block':
+      sy = 0.93; offY = drawH * 0.05;
+      tint = 'rgba(120,190,255,0.3)';
+      break;
+    case 'win': {
+      const b = Math.abs(Math.sin(t * 4));
+      offY = -b * 5; sx = 1.04; sy = 1.04;
+      break;
+    }
+    case 'ko':
+      rot = 1.25; offY = drawH * 0.22; sy = 0.92;
+      break;
+    default: break;
+  }
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(facing, 1);
+  ctx.translate(offX, offY);
+  ctx.rotate(rot);
+  ctx.scale(sx, sy);
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(img, -drawW / 2, -drawH, drawW, drawH);
+  if (tint) { ctx.fillStyle = tint; ctx.fillRect(-drawW / 2, -drawH, drawW, drawH); }
+  if (flash > 0) { ctx.fillStyle = `rgba(255,255,255,${flash * 0.55})`; ctx.fillRect(-drawW / 2, -drawH, drawW, drawH); }
+  ctx.restore();
+  return true;
+}
+
 export function drawProjectile(ctx, x, y, facing, color, t) {
   ctx.save();
   ctx.translate(x, y);

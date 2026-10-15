@@ -1,6 +1,6 @@
 import { ROSTER } from './characters.js';
 import { STAGES, STAGE_LIST } from './stages.js';
-import { drawFighterSprite, computePose } from './renderer.js';
+import { drawFighterSprite, drawFighterPortrait, computePose } from './renderer.js';
 import { Input, KEYMAP } from './input.js';
 import { Audio2026 } from './audio.js';
 import { Match, GAME_W, GAME_H } from './game.js';
@@ -20,6 +20,7 @@ export class App {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.images = {};
+    this.portraits = {};
     this.scene = 'boot';
     this.t = 0;
     this.match = null;
@@ -40,6 +41,14 @@ export class App {
       img.onerror = () => resolve();
       img.src = s.file;
       this.images[key] = img;
+    })));
+
+    await Promise.all(ROSTER.filter((c) => c.portrait).map((c) => new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
+      img.src = c.portrait;
+      this.portraits[c.id] = img;
     })));
     if (document.fonts && document.fonts.load) {
       try { await document.fonts.load('16px "Press Start 2P"'); } catch (e) { /* ignore */ }
@@ -211,7 +220,8 @@ export class App {
       p2CPU: this.setup.mode === '1p',
       difficulty: this.setup.difficulty,
       stageKey: this.setup.stage,
-      images: this.images
+      images: this.images,
+      portraits: this.portraits
     });
     this.match.onMatchEnd = () => { this.scene = 'results'; };
     this.scene = 'fight';
@@ -362,11 +372,23 @@ export class App {
     ctx.strokeStyle = selected ? '#ffce00' : '#555';
     ctx.lineWidth = selected ? 4 : 2;
     ctx.strokeRect(cx - size / 2, cy - size / 2, size, size);
-    const pose = computePose('idle', this.t * 6);
-    drawFighterSprite(ctx, { x: cx, y: cy + size * 0.32, facing: 1, scale: size / 92, visual: fighter.visual, pose });
+    this.drawFighterVisual(ctx, cx, cy + size * 0.32, 1, size * 0.9, fighter, 'idle');
     ctx.restore();
     if (labelTop) {
       this.centerText(ctx, fighter.name.toUpperCase(), cx, cy + size / 2 + 14, Math.max(8, size * 0.09), selected ? '#ffce00' : '#fff', null);
+    }
+  }
+
+  // Desenha o lutador usando o retrato-caricatura (se já carregado) ou,
+  // como alternativa, o boneco vetorial original.
+  drawFighterVisual(ctx, feetX, feetY, facing, heightUnits, fighterDef, action = 'idle') {
+    const img = this.portraits[fighterDef.id];
+    const drawn = img && drawFighterPortrait(ctx, {
+      x: feetX, y: feetY, facing, img, action, t: this.t * 6, heightUnits
+    });
+    if (!drawn) {
+      const pose = computePose(action, this.t * 6);
+      drawFighterSprite(ctx, { x: feetX, y: feetY, facing, scale: heightUnits / 150, visual: fighterDef.visual, pose });
     }
   }
 
@@ -393,8 +415,12 @@ export class App {
       ctx.strokeStyle = isP1 && isP2 ? '#ff6bd6' : isP1 ? '#ffce00' : isP2 ? '#00e5ff' : '#444';
       ctx.lineWidth = (isP1 || isP2) ? 4 : 1.5;
       ctx.strokeRect(cx - size / 2, cy - size / 2, size, size);
-      const pose = computePose('idle', this.t * 6 + i);
-      drawFighterSprite(ctx, { x: cx, y: cy + size * 0.32, facing: 1, scale: size / 100, visual: f.visual, pose });
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(cx - size / 2, cy - size / 2, size, size);
+      ctx.clip();
+      this.drawFighterVisual(ctx, cx, cy + size * 0.34, 1, size * 0.94, f, 'idle');
+      ctx.restore();
       ctx.restore();
       this.centerText(ctx, `#${f.number}`, cx, cy - size / 2 - 8, Math.max(8, size * 0.1), '#ffce00', null);
       this.centerText(ctx, f.name.toUpperCase(), cx, cy + size / 2 + 12, Math.max(7, size * 0.085), '#fff', null);
@@ -435,10 +461,9 @@ export class App {
     this.centerText(ctx, p2.name.toUpperCase(), w * 0.74, h * 0.2, 18, '#00e5ff');
     this.centerText(ctx, `${p2.party} Nº${p2.number}`, w * 0.74, h * 0.2 + 26, 11, '#fff', null);
 
-    const pose1 = computePose('idle', this.t * 6);
-    const pose2 = computePose('idle', this.t * 6 + 2);
-    drawFighterSprite(ctx, { x: w * 0.26, y: h * 0.62, facing: 1, scale: Math.min(w, h) * 0.0035, visual: p1.visual, pose: pose1 });
-    drawFighterSprite(ctx, { x: w * 0.74, y: h * 0.62, facing: -1, scale: Math.min(w, h) * 0.0035, visual: p2.visual, pose: pose2 });
+    const heightUnits = Math.min(w, h) * 0.4;
+    this.drawFighterVisual(ctx, w * 0.26, h * 0.74, 1, heightUnits, p1, 'idle');
+    this.drawFighterVisual(ctx, w * 0.74, h * 0.74, -1, heightUnits, p2, 'idle');
 
     this.centerText(ctx, 'VS', w / 2, h * 0.42, 40, '#ff4040');
 
@@ -466,8 +491,7 @@ export class App {
     const winner = m.matchWinner;
     this.centerText(ctx, `${winner.def.name.toUpperCase()} VENCEU A ELEIÇÃO!`, w / 2, h * 0.3, Math.min(22, w * 0.03), '#ffce00');
     this.centerText(ctx, `${winner.def.party} Nº${winner.def.number} — Vice: ${winner.def.vice}`, w / 2, h * 0.38, 12, '#fff', null);
-    const pose = computePose('win', this.t * 6);
-    drawFighterSprite(ctx, { x: w / 2, y: h * 0.72, facing: winner.playerIndex === 0 ? 1 : -1, scale: Math.min(w, h) * 0.0045, visual: winner.def.visual, pose });
+    this.drawFighterVisual(ctx, w / 2, h * 0.84, winner.playerIndex === 0 ? 1 : -1, Math.min(w, h) * 0.46, winner.def, 'win');
     this.centerText(ctx, `PLACAR: ${m.p1.def.name} ${m.p1.roundsWon} x ${m.p2.roundsWon} ${m.p2.def.name}`, w / 2, h * 0.5, 11, '#8fd3ff', null);
     this.centerText(ctx, 'ENTER: REVANCHE   ESC: MENU PRINCIPAL', w / 2, h - 28, 11, '#fff', null);
   }
@@ -502,10 +526,11 @@ export class App {
       '',
       'Nomes, números, partidos e vices são baseados em informações',
       'públicas sobre as candidaturas à Presidência da República em 2026.',
-      'Todos os demais elementos (aparência, poderes e falas) são ficção',
-      'cômica original — nenhuma imagem real de nenhuma pessoa é usada.',
+      'Todos os demais elementos (poderes, falas e retratos) são ficção',
+      'cômica original — nenhuma foto real de nenhuma pessoa é usada.',
       '',
-      'Lutadores: arte vetorial pixelada 100% original.',
+      'Lutadores: ilustrações de caricatura 100% geradas digitalmente,',
+      'no estilo clássico de charge/cartum editorial de jornal.',
       'Cenários: ilustrações originais geradas digitalmente.',
       'Fonte: "Press Start 2P" por Cody "CodeMan38" Boisclair (OFL).',
       'Som: sintetizado via Web Audio API.',

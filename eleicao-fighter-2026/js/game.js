@@ -1,5 +1,5 @@
 import { Fighter, GAME_W, GAME_H, STAGE_LEFT, STAGE_RIGHT, moveInfo } from './fighter.js';
-import { drawFighterSprite, drawProjectile } from './renderer.js';
+import { drawFighterSprite, drawFighterPortrait, drawProjectile } from './renderer.js';
 import { STAGES } from './stages.js';
 import { Audio2026 } from './audio.js';
 import { createAIController } from './ai.js';
@@ -8,8 +8,9 @@ const ROUND_TIME = 99;
 const ROUNDS_TO_WIN = 2;
 
 export class Match {
-  constructor({ p1Def, p2Def, p1CPU = false, p2CPU = true, difficulty = 'normal', stageKey, images }) {
+  constructor({ p1Def, p2Def, p1CPU = false, p2CPU = true, difficulty = 'normal', stageKey, images, portraits = {} }) {
     this.images = images;
+    this.portraits = portraits;
     this.stageKey = stageKey || p1Def.stage;
     this.stage = STAGES[this.stageKey];
 
@@ -324,10 +325,19 @@ export class Match {
     for (const f of order) {
       const sx = f.x;
       const sy = floorScreenY - f.y;
-      drawFighterSprite(ctx, {
-        x: sx, y: sy, facing: f.facing, scale: f.scale, visual: f.visual,
-        pose: f.getPoseFrame(), flash: f.flash
+      const portraitImg = this.portraits[f.def.id];
+      const { action, t } = f.getAnimState();
+      const drawn = portraitImg && drawFighterPortrait(ctx, {
+        x: sx, y: sy, facing: f.facing, img: portraitImg,
+        action, t: t * 6 + f.playerIndex * 10, flash: f.flash,
+        heightUnits: 136 * (f.visual.build || 1)
       });
+      if (!drawn) {
+        drawFighterSprite(ctx, {
+          x: sx, y: sy, facing: f.facing, scale: f.scale, visual: f.visual,
+          pose: f.getPoseFrame(), flash: f.flash
+        });
+      }
     }
 
     for (const pr of this.projectiles) {

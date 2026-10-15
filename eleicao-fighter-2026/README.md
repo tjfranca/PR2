@@ -9,12 +9,13 @@ Presidência da República do Brasil homologados pelo TSE para as **eleições d
 > ⚠️ **Aviso importante:** este é um projeto de **paródia e humor**, feito por
 > fã, **sem qualquer vínculo oficial** com os candidatos, partidos, coligações
 > ou com o Tribunal Superior Eleitoral (TSE). Não tem fins eleitorais,
-> comerciais ou de desinformação. Nenhuma imagem real de nenhuma pessoa é
-> usada — todos os lutadores são **avatares pixel-art 100% originais e
-> caricatos**, desenhados por código. Veja a tela de **Créditos** no jogo
-> para o texto completo. Se você é uma das pessoas retratadas (ou
-> representante legal) e tem alguma objeção, abra uma *issue* neste
-> repositório.
+> comerciais ou de desinformação. Nenhuma foto real de nenhuma pessoa é
+> usada — todos os lutadores são **ilustrações de caricatura 100% geradas
+> digitalmente**, no estilo clássico de charge/cartum editorial de jornal
+> (como uma charge política exagerada e bem-humorada, não uma foto). Veja a
+> tela de **Créditos** no jogo para o texto completo. Se você é uma das
+> pessoas retratadas (ou representante legal) e tem alguma objeção, abra uma
+> *issue* neste repositório.
 
 ## 🎮 Jogue agora
 
@@ -84,6 +85,9 @@ aparência) é **ficção cômica original** sem nenhuma pretensão de realismo.
 
 - Seleção de personagem com **12 lutadores**, grade 4×3, navegação
   independente para 1 ou 2 jogadores.
+- Retratos em **caricatura estilo charge de jornal**, 100% ilustrações
+  originais geradas digitalmente (sem fotos reais), animados na luta com
+  inclinação, solavanco e "flash" de acerto/bloqueio.
 - **5 cenários** em pixel art 16-bit, gerados digitalmente (Congresso
   Nacional, Palácio do Planalto, depósito de urnas do TSE, comício de
   campanha e estúdio de debate).

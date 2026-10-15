@@ -168,11 +168,16 @@ export class Fighter {
     }
   }
 
-  getPoseFrame() {
+  getAnimState() {
     let action = this.action;
     let t = this.actionTime;
     if (this.introTimer > 0) { action = 'idle'; t = 0; }
     if (!this.grounded && (action === 'idle' || action === 'walk')) action = 'jump';
+    return { action, t };
+  }
+
+  getPoseFrame() {
+    const { action, t } = this.getAnimState();
     return computePose(action, t * 6 + this.playerIndex * 10, { crouch: action === 'crouch' });
   }
 }
